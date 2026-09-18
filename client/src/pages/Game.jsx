@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { socket, useSocketEvent, loadSession } from '../hooks/useSocket.js';
 import Timer from '../components/Timer.jsx';
 import Stars from '../components/Stars.jsx';
-import Question from '../components/Question.jsx';м
+import Question from '../components/Question.jsx';
 
 const PHASE = { IDLE: 'idle', ANSWERING: 'answering', SCORING: 'scoring' };
 
