@@ -131,6 +131,31 @@ function registerHandlers(io, socket) {
   resetRoom(io, code);
 });
 
+  // Клиент запрашивает текущее состояние игры (для первого раунда)
+  socket.on('request_state', ({ code }) => {
+    const room = getRoom(code);
+    if (!room) return;
+    const player = room.players.find((p) => p.socketId === socket.id);
+    if (!player) return;
+
+    if (room.state === 'answering' && room.currentQuestionIndex >= 0) {
+      const question = room.questionsQueue[room.currentQuestionIndex];
+      const answerer = room.players[room.currentAnswererIndex];
+      if (question && answerer) {
+        socket.emit('question_start', {
+          questionText: question.text,
+          category: question.category,
+          answererId: answerer.id,
+          answererName: answerer.name,
+          duration: room.answerTime,
+          roundNumber: room.currentQuestionIndex + 1,
+          totalRounds: room.questionsQueue.length,
+        });
+      }
+    }
+  });
+
+
   socket.on('disconnect', () => {
     console.log(`[socket] Отключился: ${socket.id}`);
     const result = removePlayerBySocket(socket.id);

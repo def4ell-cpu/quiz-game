@@ -24,9 +24,17 @@ export default function Game() {
   const [totalRounds, setTotalRounds] = useState(16);
 
   useEffect(() => {
-    const { playerId } = loadSession();
-    if (playerId) setMyId(playerId);
-  }, []);
+  const { playerId } = loadSession();
+  if (playerId) setMyId(playerId);
+
+  // Запрашиваем текущее состояние игры (если пропустили question_start)
+  socket.emit('request_state', { code });
+  const t = setTimeout(() => {
+    socket.emit('request_state', { code });
+  }, 500);
+
+  return () => clearTimeout(t);
+}, [code]);
 
   useSocketEvent('question_start', (data) => {
   setQuestion({ text: data.questionText, category: data.category });

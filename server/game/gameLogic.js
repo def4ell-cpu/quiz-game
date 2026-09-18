@@ -45,8 +45,8 @@ function startGame(io, code) {
   room.questionsQueue = pool.slice(0, Math.min(adjusted, pool.length));
   room.currentQuestionIndex = -1;
 
-room.currentAnswererIndex = Math.floor(Math.random() * room.players.length);  room.players.forEach((p) => (p.stars = 0));
-  room.players.forEach((p) => (p.ready = false));
+  room.currentAnswererIndex = Math.floor(Math.random() * room.players.length);
+  room.players.forEach((p) => (p.stars = 0));
 
   room.state = 'answering';
   io.to(code).emit('room_update', serializeRoom(room));
