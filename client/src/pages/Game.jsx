@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { socket, useSocketEvent, loadSession } from '../hooks/useSocket.js';
 import Timer from '../components/Timer.jsx';
 import Stars from '../components/Stars.jsx';
-import Question from '../components/Question.jsx';
+import Question from '../components/Question.jsx';м
 
 const PHASE = { IDLE: 'idle', ANSWERING: 'answering', SCORING: 'scoring' };
 
@@ -29,17 +29,17 @@ export default function Game() {
   }, []);
 
   useSocketEvent('question_start', (data) => {
-    setQuestion({ text: data.questionText, category: data.category });
-    setAnswerer({ id: data.answererId, name: data.answererName });
-    setTotalTime(data.duration);
-    setRemaining(data.duration);
-    setPhase(PHASE.ANSWERING);
-    setMyRating(0);
-    setRoundResult(null);
-    setRoundNumber(data.roundNumber);
-    setTotalRounds(data.totalRounds);
-    vibrate(30);
-  });
+  setQuestion({ text: data.questionText, category: data.category });
+  setAnswerer({ id: data.answererId, name: data.answererName });
+  setTotalTime(data.duration);
+  setRemaining(data.duration);
+  setPhase(PHASE.ANSWERING);
+  setMyRating(0);
+  setRoundResult(null);
+  setRoundNumber(data.roundNumber);
+  setTotalRounds(data.totalRounds);
+  vibrate(30);
+});
 
   useSocketEvent('scoring_phase', (data) => {
     setTotalTime(data.duration);
