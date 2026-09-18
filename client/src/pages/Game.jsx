@@ -65,9 +65,9 @@ export default function Game() {
     setPhase(PHASE.IDLE);
   });
 
-  useSocketEvent('game_over', (data) => {
-    navigate(`/results/${code}`, { state: data });
-  });
+  useSocketEvent('game_over', () => {
+  navigate(`/results/${code}`);
+});
 
   useSocketEvent('room_update', (r) => {
     if (r.state === 'finished') navigate(`/results/${code}`);

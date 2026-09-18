@@ -151,7 +151,23 @@ function registerHandlers(io, socket) {
           roundNumber: room.currentQuestionIndex + 1,
           totalRounds: room.questionsQueue.length,
         });
-      }
+      }м
+    }
+  });
+    // Клиент запрашивает результаты (если game_over прошел до его перехода)
+  socket.on('request_results', ({ code }) => {
+    const room = getRoom(code);
+    if (!room) return;
+    const player = room.players.find((p) => p.socketId === socket.id);
+    if (!player) return;
+
+    if (room.state === 'finished') {
+      const sorted = [...room.players].sort((a, b) => b.stars - a.stars);
+      const winner = sorted[0];
+      socket.emit('game_over', {
+        winner: winner ? { id: winner.id, name: winner.name, stars: winner.stars } : null,
+        scores: sorted.map((p) => ({ id: p.id, name: p.name, stars: p.stars })),
+      });
     }
   });
 

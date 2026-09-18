@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { socket, useSocketEvent, loadSession, clearSession } from '../hooks/useSocket.js';
 
 export default function Results() {
   const { code } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [data, setData] = useState(location.state || null);
+  const [data, setData] = useState(null);
   const [myId, setMyId] = useState(null);
 
   useEffect(() => {
     const { playerId } = loadSession();
     setMyId(playerId);
-  }, []);
 
-  // Все получают game_over — все видят финал
+    // На случай, если game_over уже прошел — запросим состояние
+    socket.emit('request_results', { code });
+  }, [code]);
+
+  // Каждый клиент сам ловит game_over
   useSocketEvent('game_over', (d) => setData(d));
 
   // Если хост нажал «Реванш» — все возвращаются в лобби
