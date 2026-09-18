@@ -1,7 +1,6 @@
 import { io } from 'socket.io-client';
 
-const SERVER_URL = 'http://192.168.0.109:4000';
-
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://quiz-game-production-f2ee.up.railway.app';
 export const socket = io(SERVER_URL, {
   autoConnect: true,
   transports: ['websocket', 'polling'],
