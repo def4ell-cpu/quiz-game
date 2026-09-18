@@ -45,8 +45,7 @@ function startGame(io, code) {
   room.questionsQueue = pool.slice(0, Math.min(adjusted, pool.length));
   room.currentQuestionIndex = -1;
 
-  room.currentAnswererIndex = Math.floor(Math.random() * room.players.length);
-
+room.currentAnswererIndex = Math.floor(Math.random() * room.players.length) - 1;
   room.players.forEach((p) => (p.stars = 0));
   room.players.forEach((p) => (p.ready = false));
 
@@ -66,8 +65,7 @@ function startNextRound(io, code) {
     return finishGame(io, code);
   }
 
-  room.currentAnswererIndex = (room.currentAnswererIndex + 1) % room.players.length;
-  room.round.submittedRatings = {};
+room.currentAnswererIndex = (room.currentAnswererIndex + 1 + room.players.length) % room.players.length;  room.round.submittedRatings = {};
 
   const question = room.questionsQueue[room.currentQuestionIndex];
   const answerer = room.players[room.currentAnswererIndex];
