@@ -13,6 +13,7 @@ const {
 
 const {
   startGame,
+  startNextRound,
   moveToScoring,
   rateAnswer,
   resetRoom,
@@ -91,7 +92,7 @@ function registerHandlers(io, socket) {
     io.to(code).emit('room_update', serializeRoom(room));
   });
 
-  socket.on('start_game', ({ code }) => {
+    socket.on('start_game', ({ code }) => {
     const room = getRoom(code);
     if (!room) return;
     const player = room.players.find((p) => p.socketId === socket.id);
@@ -124,14 +125,38 @@ function registerHandlers(io, socket) {
   });
 
   socket.on('play_again', ({ code }) => {
-  const room = getRoom(code);
-  if (!room) return;
-  const player = room.players.find((p) => p.socketId === socket.id);
-  if (!player) return;
-  resetRoom(io, code);
-});
+    const room = getRoom(code);
+    if (!room) return;
+    const player = room.players.find((p) => p.socketId === socket.id);
+    if (!player) return;
+    resetRoom(io, code);
+  });
 
-  // Клиент запрашивает текущее состояние игры (для первого раунда)
+  // Клиент зашёл на страницу игры и готов принимать события
+  socket.on('game_ready', ({ code }) => {
+    const room = getRoom(code);
+    if (!room) return;
+    const player = room.players.find((p) => p.socketId === socket.id);
+    if (!player) return;
+
+    if (!room.gameReadyPlayers) room.gameReadyPlayers = new Set();
+    room.gameReadyPlayers.add(player.id);
+
+    console.log(`[room] ${player.name} готов к игре (${room.gameReadyPlayers.size}/${room.players.length})`);
+
+    if (
+      room.gameReadyPlayers.size >= room.players.length &&
+      room.state === 'answering' &&
+      room.currentQuestionIndex === -1
+    ) {
+      console.log(`[room] Все готовы, стартуем первый раунд`);
+      setTimeout(() => {
+        startNextRound(io, code);
+      }, 500);
+    }
+  });
+
+  // Клиент запрашивает текущий вопрос (если пропустил question_start)
   socket.on('request_state', ({ code }) => {
     const room = getRoom(code);
     if (!room) return;
@@ -151,10 +176,11 @@ function registerHandlers(io, socket) {
           roundNumber: room.currentQuestionIndex + 1,
           totalRounds: room.questionsQueue.length,
         });
-      }м
+      }
     }
   });
-    // Клиент запрашивает результаты (если game_over прошел до его перехода)
+
+  // Клиент запрашивает результаты (если game_over прошел до его перехода)
   socket.on('request_results', ({ code }) => {
     const room = getRoom(code);
     if (!room) return;
@@ -170,7 +196,6 @@ function registerHandlers(io, socket) {
       });
     }
   });
-
 
   socket.on('disconnect', () => {
     console.log(`[socket] Отключился: ${socket.id}`);

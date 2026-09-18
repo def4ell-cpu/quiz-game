@@ -26,6 +26,8 @@ export default function Game() {
   useEffect(() => {
   const { playerId } = loadSession();
   if (playerId) setMyId(playerId);
+  socket.emit('game_ready', { code });   //
+  
 
   // Запрашиваем текущее состояние игры (если пропустили question_start)
   socket.emit('request_state', { code });
